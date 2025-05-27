@@ -17,3 +17,16 @@ Route::get('/test-db', function () {
         return "❌ No se pudo conectar a la base de datos. Error: " . $e->getMessage();
     }
 });
+
+use App\Http\Controllers\ProductoController;
+
+Route::resource('productos', ProductoController::class);
+
+// Vista del formulario
+Route::get('/crearProducto', function () {
+    return view('formulario');
+});
+
+Route::apiResource('productos', ProductoController::class);
+
+

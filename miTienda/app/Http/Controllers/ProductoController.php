@@ -12,13 +12,36 @@ class ProductoController extends Controller
      */
     public function index()
     {
-        return Producto::all(); // Listar productos
+        // Obtener todos los productos
+        $productos = Producto::all();
+
+        // Devolverlos en formato JSON
+        return response()->json([
+            'message' => '✅ Listado de productos obtenido correctamente',
+            'data' => $productos
+        ]);
     }
 
     public function store(Request $request)
     {
-        $producto = Producto::create($request->all());
-        return response()->json($producto, 201); // Crear producto
+        // Validar los datos recibidos
+        $validated = $request->validate([
+            'nombre' => 'required|string|max:15|unique:productos,nombre',
+            'categoria' => 'required|string|max:15',
+            'pvp' => 'required|numeric|min:0',
+            'stock' => 'required|integer|min:0',
+            'imagen' => 'nullable|string|max:100',
+            'observaciones' => 'nullable|string'
+        ]);
+
+        // Crear el producto
+        $producto = Producto::create($validated);
+
+        // Responder con JSON
+        return response()->json([
+            'message' => 'Producto creado correctamente',
+            'producto' => $producto
+        ], 201);
     }
 
     public function show($id)
@@ -28,11 +51,29 @@ class ProductoController extends Controller
     }
 
     public function update(Request $request, $id)
-    {
-        $producto = Producto::findOrFail($id);
-        $producto->update($request->all());
-        return response()->json($producto);
-    }
+{
+    // Buscar el producto por su ID
+    $producto = Producto::findOrFail($id);
+
+    // Validar los nuevos datos
+    $validated = $request->validate([
+        'nombre' => 'required|string|max:15',
+        'categoria' => 'required|string|max:15',
+        'pvp' => 'required|numeric|min:0',
+        'stock' => 'required|integer|min:0',
+        'imagen' => 'nullable|string|max:100',
+        'observaciones' => 'nullable|string'
+    ]);
+
+    // Actualizar el producto con los datos validados
+    $producto->update($validated);
+
+    // Devolver respuesta en JSON
+    return response()->json([
+        'message' => '✅ Producto actualizado correctamente',
+        'producto' => $producto
+    ], 200);
+}
 
     public function destroy($id)
     {
