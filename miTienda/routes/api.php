@@ -20,7 +20,7 @@ Route::get('/test-db', function () {
 
 use App\Http\Controllers\ProductoController;
 
-Route::resource('productos', ProductoController::class);
+//Route::resource('productos', ProductoController::class);
 
 // Vista del formulario
 Route::get('/crearProducto', function () {

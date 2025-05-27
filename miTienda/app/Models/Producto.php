@@ -12,9 +12,8 @@ class Producto extends Model
 
     // Si tu clave primaria no se llama "id"
     protected $primaryKey = 'codprod';
-
-    // Si tu tabla no tiene columnas created_at ni updated_at
-    public $timestamps = false;
+    public $incrementing = true;         // Es autoincremental
+    public $timestamps = false;          // Si no usas created_at / updated_at
 
     // Campos que se pueden asignar masivamente (desde formularios o API)
     protected $fillable = [

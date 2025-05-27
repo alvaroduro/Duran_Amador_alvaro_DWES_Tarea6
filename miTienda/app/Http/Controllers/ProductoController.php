@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Producto;
+use Illuminate\Support\Facades\Validator;
 
 class ProductoController extends Controller
 {
@@ -46,34 +47,47 @@ class ProductoController extends Controller
 
     public function show($id)
     {
-        $producto = Producto::findOrFail($id);
+        $producto = Producto::find($id);
+
+        if (!$producto) {
+            return response()->json([
+                'message' => '❌ Producto no encontrado'
+            ], 404);
+        }
         return response()->json($producto);
     }
 
     public function update(Request $request, $id)
-{
-    // Buscar el producto por su ID
-    $producto = Producto::findOrFail($id);
+    {
+        $producto = Producto::findOrFail($id);
 
-    // Validar los nuevos datos
-    $validated = $request->validate([
-        'nombre' => 'required|string|max:15',
-        'categoria' => 'required|string|max:15',
-        'pvp' => 'required|numeric|min:0',
-        'stock' => 'required|integer|min:0',
-        'imagen' => 'nullable|string|max:100',
-        'observaciones' => 'nullable|string'
-    ]);
+        // Validación
+        $validated = Validator::make($request->all(), [
+            'nombre' => 'required|string|max:15',
+            'categoria' => 'required|string|max:15',
+            'pvp' => 'required|numeric|min:0',
+            'stock' => 'required|integer|min:0',
+            'imagen' => 'nullable|string|max:100',
+            'observaciones' => 'nullable|string'
+        ]);
 
-    // Actualizar el producto con los datos validados
-    $producto->update($validated);
+        if ($validated->fails()) {
+            return response()->json([
+                'message' => '❌ Error de validación',
+                'errors' => $validated->errors(),
+                'status' => 400
+            ]);
+        }
 
-    // Devolver respuesta en JSON
-    return response()->json([
-        'message' => '✅ Producto actualizado correctamente',
-        'producto' => $producto
-    ], 200);
-}
+        // ✅ PASAR LOS DATOS VALIDADOS
+        $producto->update($validated->validated());
+
+        return response()->json([
+            'message' => '✅ Producto actualizado correctamente',
+            'producto' => $producto
+        ], 200);
+    }
+
 
     public function destroy($id)
     {
