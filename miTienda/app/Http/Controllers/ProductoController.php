@@ -91,7 +91,19 @@ class ProductoController extends Controller
 
     public function destroy($id)
     {
-        Producto::destroy($id);
-        return response()->json(null, 204);
+        $producto = Producto::find($id);
+
+        if (!$producto) {
+            return response()->json([
+                'message' => '❌ Producto no encontrado',
+            ], 404);
+        }
+
+        $producto->delete();
+
+        return response()->json([
+            'message' => '✅ Producto eliminado correctamente',
+            'producto_eliminado' => $producto
+        ], 200);
     }
 }
