@@ -56,8 +56,11 @@
                         <td><?= htmlspecialchars($producto->observaciones) ?></td>
                         <td>
                             <a href="{{ route('productos.edit', $producto) }}" class="btn btn-sm btn-warning me-1">✏️ Editar</a>
+                             
                             <form action="{{ route('productos.destroy', $producto->codprod) }}"
                                     method="POST" class="d-inline">
+                                    @csrf
+                            @method('DELETE')
                                 <input type="hidden" name="id" value="<?= $producto->codprod ?>">
                                 <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro de eliminar este producto?')">🗑️ Eliminar</button>
                             </form>
