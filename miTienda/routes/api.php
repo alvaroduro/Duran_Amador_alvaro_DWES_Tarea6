@@ -29,4 +29,3 @@ Route::get('/crearProducto', function () {
 
 Route::apiResource('productos', ProductoController::class);
 
-

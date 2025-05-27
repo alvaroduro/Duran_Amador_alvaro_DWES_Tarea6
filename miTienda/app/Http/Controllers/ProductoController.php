@@ -14,36 +14,51 @@ class ProductoController extends Controller
     public function index()
     {
         // Obtener todos los productos
-        $productos = Producto::all();
+        $productos = Producto::all(); // o paginados con Producto::paginate(10);
+        return view('listar', compact('productos'));
 
         // Devolverlos en formato JSON
-        return response()->json([
+        /*return response()->json([
             'message' => '✅ Listado de productos obtenido correctamente',
             'data' => $productos
-        ]);
+        ]);*/
     }
 
     public function store(Request $request)
     {
-        // Validar los datos recibidos
-        $validated = $request->validate([
-            'nombre' => 'required|string|max:15|unique:productos,nombre',
+        $validated = Validator::make($request->all(), [
+            'nombre' => 'required|string|max:15',
             'categoria' => 'required|string|max:15',
             'pvp' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
-            'imagen' => 'nullable|string|max:100',
+            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'observaciones' => 'nullable|string'
         ]);
 
-        // Crear el producto
-        $producto = Producto::create($validated);
+        if ($validated->fails()) {
+            return response()->json([
+                'message' => '❌ Error de validación',
+                'errors' => $validated->errors()
+            ], 400);
+        }
 
-        // Responder con JSON
+        $data = $request->all();
+
+        if ($request->hasFile('imagen')) {
+            $imagen = $request->file('imagen');
+            $nombreImagen = time() . '_' . $imagen->getClientOriginalName();
+            $imagen->move(public_path('images'), $nombreImagen);
+            $data['imagen'] = 'images/' . $nombreImagen;
+        }
+
+        $producto = Producto::create($data);
+
         return response()->json([
-            'message' => 'Producto creado correctamente',
+            'message' => '✅ Producto creado correctamente',
             'producto' => $producto
         ], 201);
     }
+
 
     public function show($id)
     {
@@ -61,32 +76,41 @@ class ProductoController extends Controller
     {
         $producto = Producto::findOrFail($id);
 
-        // Validación
         $validated = Validator::make($request->all(), [
             'nombre' => 'required|string|max:15',
             'categoria' => 'required|string|max:15',
             'pvp' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
-            'imagen' => 'nullable|string|max:100',
+            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'observaciones' => 'nullable|string'
         ]);
 
         if ($validated->fails()) {
             return response()->json([
                 'message' => '❌ Error de validación',
-                'errors' => $validated->errors(),
-                'status' => 400
-            ]);
+                'errors' => $validated->errors()
+            ], 400);
         }
 
-        // ✅ PASAR LOS DATOS VALIDADOS
-        $producto->update($validated->validated());
+        $data = $request->all();
+
+        if ($request->hasFile('imagen')) {
+            $imagen = $request->file('imagen');
+            $nombreImagen = time() . '_' . $imagen->getClientOriginalName();
+            $imagen->move(public_path('images'), $nombreImagen);
+            $data['imagen'] = 'images/' . $nombreImagen;
+        } else {
+            $data['imagen'] = $producto->imagen; // mantener imagen anterior si no se sube nueva
+        }
+
+        $producto->update($data);
 
         return response()->json([
             'message' => '✅ Producto actualizado correctamente',
             'producto' => $producto
         ], 200);
     }
+
 
 
     public function destroy($id)
@@ -105,5 +129,13 @@ class ProductoController extends Controller
             'message' => '✅ Producto eliminado correctamente',
             'producto_eliminado' => $producto
         ], 200);
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Producto $producto)
+    {
+        return view('edit', compact('producto'));
     }
 }
