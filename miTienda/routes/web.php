@@ -19,3 +19,4 @@ Route::get('/test-db', function () {
 
 });
 Route::resource('productos', ProductoController::class);
+Route::put('/productos/{id}', [ProductoController::class, 'update'])->name('productos.update');

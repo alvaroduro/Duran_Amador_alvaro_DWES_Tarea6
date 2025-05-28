@@ -23,9 +23,10 @@ use App\Http\Controllers\ProductoController;
 //Route::resource('productos', ProductoController::class);
 
 // Vista del formulario
-Route::get('/crearProducto', function () {
-    return view('formulario');
-});
+Route::post('/crearProducto', [ProductoController::class, 'store']);
+
+
 
 Route::apiResource('productos', ProductoController::class);
+
 

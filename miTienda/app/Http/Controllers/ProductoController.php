@@ -15,13 +15,13 @@ class ProductoController extends Controller
     {
         // Obtener todos los productos
         $productos = Producto::all(); // o paginados con Producto::paginate(10);
-        return view('listar', compact('productos'));
+        //return view('listar', compact('productos'));
 
         // Devolverlos en formato JSON
-        /*return response()->json([
+        return response()->json([
             'message' => '✅ Listado de productos obtenido correctamente',
             'data' => $productos
-        ]);*/
+        ]);
     }
 
     public function store(Request $request)
@@ -107,7 +107,7 @@ class ProductoController extends Controller
 
         return response()->json([
             'message' => '✅ Producto actualizado correctamente',
-            'producto' => $producto
+            'producto_actualizado' => $producto
         ], 200);
     }
 

@@ -10,7 +10,8 @@
 <body>
     <div class="container mt-5">
         <h2>Formulario para crear producto</h2>
-        <form method="POST" action="{{ route('productos.store') }}" enctype="multipart/form-data">
+        <form method="POST" action="{{ route('poductos.store') }}" enctype="multipart/form-data">
+
             @csrf
             <div class="mb-3">
                 <label class="form-label">Nombre:</label>
